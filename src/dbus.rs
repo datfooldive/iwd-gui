@@ -1,8 +1,8 @@
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
 
-use zbus::blocking::{Connection, Proxy};
 use zbus::DBusError;
+use zbus::blocking::{Connection, Proxy};
 use zvariant::{ObjectPath, OwnedObjectPath, OwnedValue};
 
 use crate::models::{DeviceInfo, KnownNetwork, VisibleNetwork};
@@ -106,8 +106,8 @@ impl<'a> RegisteredAgent<'a> {
 
         let manager = Proxy::new(conn, IWD_SERVICE, "/net/connman/iwd", AGENT_MANAGER_IFACE)
             .map_err(|e| e.to_string())?;
-        let path =
-            ObjectPath::try_from(AGENT_OBJECT_PATH).map_err(|e| format!("invalid agent path: {e}"))?;
+        let path = ObjectPath::try_from(AGENT_OBJECT_PATH)
+            .map_err(|e| format!("invalid agent path: {e}"))?;
         let _: () = manager
             .call("RegisterAgent", &(path))
             .map_err(|e| e.to_string())?;
@@ -193,7 +193,9 @@ impl IwdDbus {
             let ssid: String = proxy
                 .get_property("Name")
                 .map_err(|e| format!("Failed to read network name at {}: {e}", path.as_str()))?;
-            let security: String = proxy.get_property("Type").unwrap_or_else(|_| "-".to_string());
+            let security: String = proxy
+                .get_property("Type")
+                .unwrap_or_else(|_| "-".to_string());
             let connected: bool = proxy.get_property("Connected").unwrap_or(false);
             let signal_dbm: i16 = proxy.get_property("Signal").unwrap_or(0);
             let signal = if signal_dbm == 0 {
@@ -244,7 +246,9 @@ impl IwdDbus {
             let name: String = proxy
                 .get_property("Name")
                 .map_err(|e| format!("Failed to read known network name: {e}"))?;
-            let network_type: String = proxy.get_property("Type").unwrap_or_else(|_| "-".to_string());
+            let network_type: String = proxy
+                .get_property("Type")
+                .unwrap_or_else(|_| "-".to_string());
             let autoconnect: Option<bool> = proxy.get_property("AutoConnect").ok();
             let hidden: Option<bool> = proxy.get_property("Hidden").ok();
 
@@ -291,7 +295,11 @@ impl IwdDbus {
         Ok(())
     }
 
-    pub(crate) fn set_known_autoconnect(&self, known_path: &str, enabled: bool) -> Result<(), String> {
+    pub(crate) fn set_known_autoconnect(
+        &self,
+        known_path: &str,
+        enabled: bool,
+    ) -> Result<(), String> {
         let proxy = Proxy::new(&self.conn, IWD_SERVICE, known_path, KNOWN_NETWORK_IFACE)
             .map_err(|e| e.to_string())?;
         proxy
