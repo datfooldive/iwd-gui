@@ -1,0 +1,9 @@
+[package]
+name = "iwd-gui"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+eframe = "0.33.3"
+zbus = "5.13.2"
+zvariant = "5.9.2"
